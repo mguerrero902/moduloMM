@@ -16,8 +16,6 @@
  * 6. Se necesita función para impresión de matrices (doble puntero)
  */
 
-
-/*Interfaces*/
 #include "modulo.h"
 #include <stdio.h>
 #include <time.h>
@@ -25,48 +23,48 @@
 #include <pthread.h>
 #include <sys/time.h>
 
-/*  @breif main(): Main function
-*/
-int main(int argc, char* argv[]){
+int main(int argc, char *argv[])
+{
 
+    struct arg_struct args;
 
-
-     struct arg_struct args;
-
-    if (argc!=3){
+    if (argc != 3)
+    {
         printf("./MMPosix <matrix size> <# of threads>\n");
         return -1;
     }
 
-    /*Init of global variables*/
-    args.N           = atof(argv[1]);    /* Matrix's size.*/
-    args.Nthreads    = atof(argv[2]);    /* Number of threads.*/
-    
-    pthread_t *threads=(pthread_t*)malloc(args.N*sizeof(pthread_t));//Thread reservation
-    /*Memory creation and reserce for each matrix*/
-    args.Ma = memReserve(args.N); 
+    args.N = atof(argv[1]);
+    args.Nthreads = atof(argv[2]);
+
+    pthread_t *threads = (pthread_t *)malloc(args.N * sizeof(pthread_t));
+    args.Ma = memReserve(args.N);
     args.Mb = memReserve(args.N);
     args.Mc = memReserve(args.N);
-    initMatrix_DoublePointers (args.Ma, args.Mb, args.Mc, args.N);
-    if (args.N<4){
+    initMatrix_DoublePointers(args.Ma, args.Mb, args.Mc, args.N);
+    if (args.N < 4)
+    {
         printf("Matriz A\n");
-        printMatrix_DoublePointers (args.Ma, args.N);
+        printMatrix_DoublePointers(args.Ma, args.N);
         printf("Matriz B\n");
-        printMatrix_DoublePointers (args.Mb, args.N);
+        printMatrix_DoublePointers(args.Mb, args.N);
     }
     sampleStart();
-    for (int i = 0; i < args.Nthreads; ++i){
-        args.idThread=i;
-        pthread_create(&threads[i],NULL,&multMM,(void *)&args);
+    for (int i = 0; i < args.Nthreads; ++i)
+    {
+        args.idThread = i;
+        pthread_create(&threads[i], NULL, &multMM, (void *)&args);
     }
-    for (int i = 0; i < args.Nthreads; ++i){
-        pthread_join(threads[i],NULL);
+    for (int i = 0; i < args.Nthreads; ++i)
+    {
+        pthread_join(threads[i], NULL);
     }
     sampleEnd();
     free(threads);
-    if (args.N<4){
+    if (args.N < 4)
+    {
         printf("Matriz C\n");
-        printMatrix_DoublePointers (args.Mc, args.N);
+        printMatrix_DoublePointers(args.Mc, args.N);
     }
 
     return 0;
